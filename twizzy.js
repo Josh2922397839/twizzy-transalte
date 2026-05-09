@@ -315,6 +315,47 @@ copyBtn.addEventListener("click", async function () {
   }
 });
 
+// Export translation
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+
+exportBtn.addEventListener("click", function () {
+  const text = outputText.value;
+  if (!text) return;
+
+  const timestamp = new Date().toISOString().slice(0, 16).replace(/[T:]/g, "-");
+  const filename = `translation_${currentArtist.replace(/\s+/g, "_")}_${timestamp}.txt`;
+  const header = `=== Twizzy Translate ===\nArtist: ${currentArtist}\nDirection: ${isEnglishToArtist ? "English → Slang" : "Slang → English"}\nDate: ${new Date().toLocaleString()}\n${"=".repeat(24)}\n\n`;
+  const blob = new Blob([header + "Input:\n" + inputText.value + "\n\nTranslation:\n" + text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  exportBtn.classList.add("panel-btn--success");
+  setTimeout(() => exportBtn.classList.remove("panel-btn--success"), 1500);
+});
+
+importBtn.addEventListener("click", () => importFile.click());
+
+importFile.addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (ev) {
+    inputText.value = ev.target.result;
+    translate();
+    updateSuggestions();
+    updateCounts();
+  };
+  reader.readAsText(file);
+  importFile.value = "";
+});
+
 // ── Theme Toggle ──
 function setTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);

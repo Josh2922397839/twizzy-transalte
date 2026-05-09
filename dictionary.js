@@ -130,7 +130,16 @@ const megaDictionary = {
     "Tank": ["Large imposing person", "large vehicle", "big strong person"],
     "Piss yoinky": ["High from holding in the pee"],
     "Wok": ["Wockhardt", "lean"],
-    "Swervin": ["Driving recklessly"]
+    "Swervin": ["Driving recklessly"],
+    "Big body": ["Large vehicle", "Luxury SUV"],
+    "Lüh crank": ["Small dose", "Little bit"],
+    "Poppin": ["Popular", "Going off"],
+    "Glizzy": ["Gun", "Glock"],
+    "Bussin": ["Really good", "Going hard"],
+    "No cap": ["No lie", "For real"],
+    "Faded": ["High", "Intoxicated"],
+    "Drip": ["Style", "Fashion"],
+    "Ice": ["Diamonds", "Jewelry"]
   },
   "EsDeeKid (UK/Liverpool)": {
     "Plod": ["Police Officer"],
@@ -256,7 +265,16 @@ const megaDictionary = {
     "Bizzies": ["Police officers", "The police"],
     "Belter": ["Something amazing", "Great thing"],
     "Beaut": ["Beautiful", "Amazing", "Gorgeous"],
-    "Cardi": ["Cardigan", "Sweater"]
+    "Cardi": ["Cardigan", "Sweater"],
+    "Brolly": ["Umbrella"],
+    "Muz": ["Music", "Tunes"],
+    "Lolly": ["Money", "Sweets"],
+    "Minging": ["Disgusting", "Ugly"],
+    "Plazzy": ["Fake", "Plastic"],
+    "La": ["Lad", "Friend"],
+    "Devo": ["Devastated", "Gutted"],
+    "Cob": ["Bread roll", "Bun"],
+    "Ozzy": ["Hospital", "The ozzy"]
   },
   "Ken Carson": {
     "Opium": ["Record label", "Vampire aesthetic"],
@@ -457,7 +475,16 @@ const megaDictionary = {
     "Pull up": ["Arrive", "Come through"],
     "Slide": ["Come over", "Pull up"],
     "Dip": ["Leave", "Bounce"],
-    "Tweakin": ["Acting crazy", "Bugging"]
+    "Tweakin": ["Acting crazy", "Bugging"],
+    "Pew": ["Gun shot", "Shooting"],
+    "Crib": ["House", "Home"],
+    "Bread": ["Money", "Cash"],
+    "Digits": ["Phone number", "Number"],
+    "Goons": ["Crew", "Henchmen"],
+    "Wifey": ["Girlfriend", "Main girl"],
+    "Draco": ["Small AK-47", "Gun"],
+    "Sauce": ["Swag", "Style"],
+    "Vibes": ["Good energy", "Mood"]
   },
   "Destroy Lonely": {
     "Lone": ["Nickname", "Solo", "Independent"],
@@ -557,7 +584,16 @@ const megaDictionary = {
     "Turnt": ["Hyped", "Energized"],
     "Steez": ["Style with ease", "Effortless drip"],
     "Bando": ["Trap house", "Abandoned building"],
-    "Finesse": ["To trick", "Outsmart"]
+    "Finesse": ["To trick", "Outsmart"],
+    "Stash": ["Hidden supply", "Hidden spot"],
+    "Camo": ["Camouflage clothing", "Military print"],
+    "Ghost": ["Disappear", "Go silent"],
+    "Demons": ["Inner struggles", "Dark thoughts"],
+    "Rona": ["Pandemic", "COVID-19 era"],
+    "Taxed": ["Overpriced", "Robbed"],
+    "Muggin": ["Looking crazy", "Staring"],
+    "Walk": ["Walk away", "Confident walk"],
+    "Fiend": ["Addict", "Craving"]
   },
   "Lucki": {
     "Tune": ["Nickname", "Lucki"],
@@ -659,7 +695,16 @@ const megaDictionary = {
     "Strap": ["Gun", "Firearm"],
     "Pole": ["Gun", "Long gun"],
     "Heat": ["Gun", "Weapon"],
-    "Lick": ["Easy robbery", "Come-up"]
+    "Lick": ["Easy robbery", "Come-up"],
+    "Dime": ["Perfect 10", "Beautiful person"],
+    "Baguette": ["Diamond cut", "Ice"],
+    "Tote": ["To carry", "Hold"],
+    "Sack": ["Get rid of", "Fire someone"],
+    "Trapping": ["Selling drugs", "Hustling"],
+    "Playa": ["Player", "Smooth person"],
+    "Big dawg": ["Important person", "Boss"],
+    "Crash": ["Fall asleep", "Pass out"],
+    "Peelin": ["Shooting", "Firing"]
   },
   "BabyTron": {
     "Punch": ["Credit card fraud", "Punching a card", "Scamming"],
@@ -761,7 +806,16 @@ const megaDictionary = {
     "Spin": ["Drive by", "Retaliate"],
     "Tweakin": ["Acting crazy", "Bugging"],
     "Finna": ["About to", "Going to"],
-    "Bet": ["Agreed", "Okay"]
+    "Bet": ["Agreed", "Okay"],
+    "Crypto": ["Digital currency", "Bitcoin"],
+    "Wig": ["Head", "Hair piece"],
+    "Flop": ["Fail", "Didn't work"],
+    "Dirty": ["Foul play", "Grimey"],
+    "Stamp": ["Approve", "Validate"],
+    "Invoice": ["Scam demand", "Fraud bill"],
+    "Routing": ["Bank routing number", "Financial info"],
+    "Debug": ["Fix a problem", "Troubleshoot a scam"],
+    "Malware": ["Digital virus", "Harmful software"]
   },
   "Summrs": {
     "Plugg": ["Beat subgenre", "plug beat"],
@@ -863,6 +917,15 @@ const megaDictionary = {
     "Bando": ["Trap house", "Abandoned building"],
     "Strap": ["Gun", "Firearm"],
     "Pole": ["Gun", "Long gun"],
-    "Heat": ["Gun", "Weapon"]
+    "Heat": ["Gun", "Weapon"],
+    "Dripset": ["Full outfit", "Drip ensemble"],
+    "Wooly": ["Soft", "Warm feeling"],
+    "Sneaky": ["Secretive", "Lowkey"],
+    "Pluto": ["Far out", "Otherworldly"],
+    "Lonely": ["Solo", "Isolated"],
+    "Remedy": ["Fix", "Solution"],
+    "Prada": ["Prada brand", "High fashion"],
+    "Droptop": ["Convertible", "Open roof car"],
+    "Rari": ["Ferrari", "Fast car"]
   }
 };

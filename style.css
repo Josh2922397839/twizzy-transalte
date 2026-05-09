@@ -45,7 +45,7 @@
   --warning: #f59e0b;
 }
 
-  /* Light theme - Premium */
+[data-theme="light"] {
   --bg-primary: #f8fafc;
   --bg-secondary: #f1f5f9;
   --bg-card: rgba(255, 255, 255, 0.85);
@@ -88,7 +88,11 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
-  transition: background-color var(--transition-slow), color var(--transition-slow);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+*, *::before, *::after {
+  transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.3s ease;
 }
 
 /* ── Animated Background ── */
@@ -324,6 +328,8 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px 0;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .artist-bar__label {
@@ -500,6 +506,7 @@ body {
 
 .text-panel__textarea:focus {
   outline: none;
+  box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.05);
 }
 
 .text-panel__textarea:disabled {
@@ -529,15 +536,29 @@ body {
   font-size: 11px;
   color: var(--text-primary);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s ease;
   font-family: var(--font-body);
+  animation: chipFadeIn 0.2s ease forwards;
+  opacity: 0;
+}
+
+.suggestion-chip:nth-child(1) { animation-delay: 0s; }
+.suggestion-chip:nth-child(2) { animation-delay: 0.05s; }
+.suggestion-chip:nth-child(3) { animation-delay: 0.1s; }
+.suggestion-chip:nth-child(4) { animation-delay: 0.15s; }
+.suggestion-chip:nth-child(5) { animation-delay: 0.2s; }
+
+@keyframes chipFadeIn {
+  from { opacity: 0; transform: translateY(4px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .suggestion-chip:hover {
   background: var(--accent-primary);
   color: white;
   border-color: var(--accent-primary);
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px var(--accent-primary-glow);
 }
 
 /* ── Panel Footer (counts + actions) ── */
@@ -828,6 +849,29 @@ body {
   color: var(--accent-primary);
 }
 
+.footer__shortcuts {
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.footer__shortcuts kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 9px;
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-color-subtle);
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.panel-btn:active {
+  transform: scale(0.9);
+}
+
 /* ── Animations ── */
 @keyframes fadeInUp {
   from {
@@ -956,6 +1000,24 @@ body {
 
   .dict-entry__yeat {
     font-size: 13px;
+  }
+
+  .footer__shortcuts {
+    display: none;
+  }
+
+  .suggestions {
+    padding: 0 16px;
+    gap: 6px;
+  }
+
+  .suggestion-chip {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .panel-actions {
+    gap: 2px;
   }
 }
 
