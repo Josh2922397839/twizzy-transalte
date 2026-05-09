@@ -2,10 +2,15 @@
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>The Ultimate Slang Translator</title>
-    <meta name="description" content="Translate between English and underground rap/regional slang. The ultimate slang dictionary and translator." />
+    <meta name="description" content="The world's most advanced slang translator. Translate between English and underground rap/regional slang instantly with word highlighting, voice input, fuzzy matching, and more." />
     <meta name="theme-color" content="#06060c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta property="og:title" content="The Ultimate Slang Translator" />
+    <meta property="og:description" content="Translate between English and underground rap/regional slang instantly." />
+    <meta property="og:type" content="website" />
     <link rel="stylesheet" href="./style.css" />
     <script src="./dictionary.js"></script>
   </head>
@@ -28,20 +33,13 @@
           <span class="logo__text">Slang Translator</span>
         </a>
         <div class="header__actions">
-          <button
-            class="btn-icon"
-            id="dictToggle"
-            aria-label="Browse Dictionary"
-            title="Browse Dictionary"
-          >
+          <button class="btn-icon" id="historyToggle" aria-label="Translation History" title="History (Ctrl+Shift+H)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+          </button>
+          <button class="btn-icon" id="dictToggle" aria-label="Browse Dictionary" title="Browse Dictionary (Ctrl+Shift+D)">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
           </button>
-          <button
-            class="theme-toggle"
-            id="themeToggle"
-            aria-label="Toggle theme"
-            title="Toggle dark/light mode"
-          >
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle dark/light mode">
             <div class="theme-toggle__knob">
               <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
             </div>
@@ -61,26 +59,20 @@
           <span class="artist-bar__label">Select Artist</span>
           <span class="artist-bar__count" id="artistCount"></span>
         </div>
+
         <!-- Language Bar -->
         <div class="lang-bar">
-          <select class="lang-select" id="artistSelect" aria-label="Select Artist">
-            <!-- Options populated by JS -->
-          </select>
-          <div class="lang-label lang-label--active hidden" id="inputLabel">
-            <!-- Used when English is on the left -->
-            English
-          </div>
+          <select class="lang-select" id="artistSelect" aria-label="Select Artist"></select>
+          <div class="lang-label lang-label--active hidden" id="inputLabel">English</div>
 
-          <button class="swap-btn" id="swapBtn" aria-label="Swap languages" title="Swap languages">
+          <button class="swap-btn" id="swapBtn" aria-label="Swap languages" title="Swap languages (Ctrl+Shift+S)">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
               <path d="M32 96l320 0V32c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l96 96c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-96 96c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V160L32 160c-17.7 0-32-14.3-32-32s14.3-32 32-32zM480 352c17.7 0 32 14.3 32 32s-14.3 32-32 32H160v64c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-96-96c-6-6-9.4-14.1-9.4-22.6s3.4-16.6 9.4-22.6l96-96c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 64H480z"/>
             </svg>
           </button>
 
           <div class="lang-label" id="outputLabel">English</div>
-          <select class="lang-select hidden" id="outputSelect" aria-label="Select Artist">
-            <!-- Used when English is on the left -->
-          </select>
+          <select class="lang-select hidden" id="outputSelect" aria-label="Select Artist"></select>
         </div>
 
         <!-- Text Panels -->
@@ -98,6 +90,10 @@
             <div class="text-panel__footer">
               <span class="char-count" id="inputCount">0 chars · 0 words</span>
               <div class="panel-actions">
+                <button class="panel-btn" id="voiceInputBtn" aria-label="Voice input" title="Voice input (Ctrl+Shift+V)">
+                  <span class="tooltip">Speak</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+                </button>
                 <button class="panel-btn" id="clearBtn" aria-label="Clear input" title="Clear">
                   <span class="tooltip">Clear</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
@@ -108,17 +104,29 @@
 
           <!-- Output Panel -->
           <div class="text-panel">
-            <textarea
-              id="outputText"
-              class="text-panel__textarea"
-              placeholder="Translation will appear here..."
-              disabled
-              spellcheck="false"
-            ></textarea>
-            <div class="suggestions"></div> <!-- Spacer for alignment -->
+            <div
+              id="outputDisplay"
+              class="text-panel__display"
+              role="textbox"
+              aria-readonly="true"
+              aria-label="Translation output"
+              aria-live="polite"
+            >
+              <span class="text-panel__placeholder">Translation will appear here...</span>
+            </div>
+            <textarea id="outputText" class="hidden" aria-hidden="true"></textarea>
+            <div class="suggestions"></div>
             <div class="text-panel__footer">
               <span class="char-count" id="outputCount">0 chars · 0 words</span>
               <div class="panel-actions">
+                <button class="panel-btn" id="speakBtn" aria-label="Read aloud" title="Read aloud">
+                  <span class="tooltip">Speak</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                </button>
+                <button class="panel-btn" id="shareBtn" aria-label="Share translation" title="Share">
+                  <span class="tooltip">Share</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+                </button>
                 <button class="panel-btn" id="importBtn" aria-label="Import text file" title="Import .txt">
                   <span class="tooltip">Import</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -127,7 +135,7 @@
                   <span class="tooltip">Export</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                 </button>
-                <button class="panel-btn" id="copyBtn" aria-label="Copy translation" title="Copy">
+                <button class="panel-btn" id="copyBtn" aria-label="Copy translation" title="Copy (Ctrl+Shift+C)">
                   <span class="tooltip" id="copyTooltip">Copy</span>
                   <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                   <svg class="check-icon hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
@@ -136,26 +144,36 @@
             </div>
           </div>
         </div>
+
+        <!-- Translation Stats Bar -->
+        <div class="stats-bar" id="statsBar"></div>
       </main>
 
-      <!-- Hidden file input for import -->
+      <!-- Hidden file input -->
       <input type="file" id="importFile" accept=".txt" class="hidden" />
+
+      <!-- Toast -->
+      <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
 
       <!-- Footer -->
       <footer class="footer animate-in animate-in--delay-3">
         The Ultimate Slang Translator · Built for the culture
         <div class="footer__shortcuts">
-          <kbd>Ctrl+Shift+S</kbd> Swap · <kbd>Ctrl+Shift+C</kbd> Copy · <kbd>Ctrl+Shift+D</kbd> Dictionary
+          <kbd>Ctrl+Shift+S</kbd> Swap ·
+          <kbd>Ctrl+Shift+C</kbd> Copy ·
+          <kbd>Ctrl+Shift+D</kbd> Dictionary ·
+          <kbd>Ctrl+Shift+H</kbd> History ·
+          <kbd>Ctrl+Shift+V</kbd> Voice
         </div>
       </footer>
     </div>
 
     <!-- Dictionary Modal -->
-    <div class="dict-overlay" id="dictOverlay">
-      <div class="dict-modal">
-        <div class="dict-header">
+    <div class="modal-overlay" id="dictOverlay">
+      <div class="modal dict-modal">
+        <div class="modal-header">
           <h2>Slang Dictionary</h2>
-          <button class="dict-close" id="dictClose" aria-label="Close dictionary">
+          <button class="modal-close" id="dictClose" aria-label="Close dictionary">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
           </button>
         </div>
@@ -164,16 +182,29 @@
             <span class="dict-search-icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </span>
-            <input
-              type="text"
-              id="dictSearchInput"
-              placeholder="Search dictionary..."
-              autocomplete="off"
-            />
+            <input type="text" id="dictSearchInput" placeholder="Search dictionary..." autocomplete="off" />
           </div>
         </div>
         <div class="dict-count" id="dictCount"></div>
         <div class="dict-list" id="dictList"></div>
+      </div>
+    </div>
+
+    <!-- History Modal -->
+    <div class="modal-overlay" id="historyOverlay">
+      <div class="modal history-modal">
+        <div class="modal-header">
+          <h2>Translation History</h2>
+          <div class="modal-header__actions">
+            <button class="btn-icon btn-icon--sm" id="historyClear" aria-label="Clear history" title="Clear all history">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            </button>
+            <button class="modal-close" id="historyClose" aria-label="Close history">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="history-list" id="historyList"></div>
       </div>
     </div>
 
