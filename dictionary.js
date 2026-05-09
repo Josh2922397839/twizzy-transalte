@@ -127,7 +127,10 @@ const megaDictionary = {
     "Swervin and dabbin": ["Driving recklessly and smoking dabs", "high energy"],
     "Rip up the curb": ["Driving recklessly", "reckless driving"],
     "Ella": ["Los Angeles", "l.a."],
-    "Tank": ["Large imposing person", "large vehicle", "big strong person"]
+    "Tank": ["Large imposing person", "large vehicle", "big strong person"],
+    "Piss yoinky": ["High from holding in the pee"],
+    "Wok": ["Wockhardt", "lean"],
+    "Swervin": ["Driving recklessly"]
   },
   "EsDeeKid (UK/Liverpool)": {
     "Plod": ["Police Officer"],

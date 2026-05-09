@@ -499,7 +499,7 @@ body {
 }
 
 .text-panel__textarea:focus {
-  background: var(--bg-hover);
+  outline: none;
 }
 
 .text-panel__textarea:disabled {
@@ -507,6 +507,37 @@ body {
   opacity: 0.95;
   cursor: default;
   -webkit-text-fill-color: var(--text-primary);
+  background: transparent;
+}
+
+/* ── Suggestions ── */
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 20px;
+  min-height: 28px;
+  margin-top: -10px;
+  margin-bottom: 8px;
+}
+
+.suggestion-chip {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.suggestion-chip:hover {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
 }
 
 /* ── Panel Footer (counts + actions) ── */

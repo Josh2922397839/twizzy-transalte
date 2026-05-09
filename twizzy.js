@@ -23,6 +23,7 @@ const dictSearchInput = document.getElementById("dictSearchInput");
 const dictList = document.getElementById("dictList");
 const dictCount = document.getElementById("dictCount");
 const artistCountEl = document.getElementById("artistCount");
+const suggestionsBox = document.getElementById("suggestionsBox");
 
 // ── State ──
 let isEnglishToArtist = false;
@@ -159,7 +160,56 @@ function formatCount(text) {
 // ── Event Listeners ──
 
 // Live translation on input
-inputText.addEventListener("input", translate);
+inputText.addEventListener("input", () => {
+  translate();
+  updateSuggestions();
+});
+
+// Autocomplete Suggestions
+function updateSuggestions() {
+  if (!suggestionsBox) return;
+  
+  const text = inputText.value;
+  const words = text.split(/\s+/);
+  const lastWord = words[words.length - 1];
+  
+  if (lastWord.length < 2) {
+    suggestionsBox.innerHTML = "";
+    return;
+  }
+
+  const search = lastWord.toLowerCase();
+  const currentDict = isEnglishToArtist ? dictionaryEng : dictionaryArtist;
+  const suggestions = [];
+  
+  for (const key of Object.keys(currentDict)) {
+    if (key.toLowerCase().startsWith(search) && key.toLowerCase() !== search) {
+      // Capitalize properly if the key is capitalized
+      const displayKey = initialIsCapital(key) ? capitalizeFirstLetter(key) : key;
+      suggestions.push(displayKey);
+      if (suggestions.length >= 5) break;
+    }
+  }
+  
+  if (suggestions.length === 0) {
+    suggestionsBox.innerHTML = "";
+    return;
+  }
+  
+  suggestionsBox.innerHTML = suggestions.map(s => `<span class="suggestion-chip">${s}</span>`).join("");
+  
+  const chips = suggestionsBox.querySelectorAll('.suggestion-chip');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const textVal = inputText.value;
+      const newText = textVal.slice(0, textVal.length - lastWord.length) + chip.textContent + " ";
+      inputText.value = newText;
+      translate();
+      suggestionsBox.innerHTML = "";
+      inputText.focus();
+    });
+  });
+}
 
 // Artist changes
 artistSelect.addEventListener("change", (e) => {
@@ -206,6 +256,7 @@ swapBtn.addEventListener("click", function () {
 clearBtn.addEventListener("click", function () {
   inputText.value = "";
   outputText.value = "";
+  if (suggestionsBox) suggestionsBox.innerHTML = "";
   inputText.focus();
   updateCounts();
 
