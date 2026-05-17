@@ -102,7 +102,11 @@ const megaDictionary = {
     "Opium": ["Record label", "Collective"],
     "Vamp": ["Opium fan", "Playboi Carti associate"],
     "YVL": ["Young Vampire Life", "Collective lifestyle"],
-    "Wax": ["Record music", "Rap"]
+    "Wax": ["Record music", "Rap"],
+    "Piru": ["Blood set affiliation", "Atlanta gang"],
+    "Beno": ["Homixide Gang member"],
+    "Meechie": ["Homixide Gang member"],
+    "Snot": ["Disrespect", "Gang sign"]
   },
   "OsamaSon": {
     "Flxtra": ["Flexing extra", "Showing off"],
@@ -111,7 +115,11 @@ const megaDictionary = {
     "Stun": ["Stunting", "Flexing"],
     "Wock": ["Lean", "Promethazine codeine"],
     "Krank": ["Excited", "High energy"],
-    "Rage": ["High energy trap", "Synthesizer heavy beat"]
+    "Rage": ["High energy trap", "Synthesizer heavy beat"],
+    "So Tuff": ["The way he smile", "Extremely cool", "Glazing comment"],
+    "Son": ["Laughing reaction", "Brainrot disbelief", "Meme reference"],
+    "Aura": ["Coolness", "Distinct presence", "Vibe"],
+    "Jumpout": ["Leaked song", "Album reference", "Jumping out"]
   },
   "Che": {
     "Che": ["The artist", "Himself"],
@@ -119,7 +127,10 @@ const megaDictionary = {
     "Crushed up": ["Crushed pills", "Percocet"],
     "Fye": ["Fire", "Amazing"],
     "Slatt": ["Slime love all the time", "Brother"],
-    "Vamp": ["Dark aesthetic", "Fan"]
+    "Vamp": ["Dark aesthetic", "Fan"],
+    "Hyperpop": ["Maximalist production", "Music style"],
+    "Plugg": ["Trap subgenre", "Underground sound"],
+    "Underground": ["SoundCloud rap scene", "Internet rap"]
   },
   "EsDeeKid (UK/Liverpool)": {
     "Plod": ["Police Officer"],
