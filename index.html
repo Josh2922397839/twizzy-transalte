@@ -4,224 +4,226 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>The Ultimate Slang Translator</title>
-    <meta name="description" content="The world's most advanced slang translator. Translate between English and underground rap/regional slang instantly with word highlighting, voice input, fuzzy matching, and more." />
-    <meta name="theme-color" content="#06060c" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta property="og:title" content="The Ultimate Slang Translator" />
-    <meta property="og:description" content="Translate between English and underground rap/regional slang instantly." />
-    <meta property="og:type" content="website" />
+    <meta name="description" content="The world's most advanced slang translator. Translate between English and underground rap/regional slang instantly." />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Outfit', 'sans-serif'],
+            },
+            colors: {
+              // We map Tailwind colors to CSS variables so your JS dark/light toggle works flawlessly
+              base: 'var(--bg-base)',
+              card: 'var(--bg-card)',
+              input: 'var(--bg-input)',
+              hover: 'var(--bg-hover)',
+              main: 'var(--text-main)',
+              muted: 'var(--text-muted)',
+              divider: 'var(--border-subtle)',
+              primary: { 400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed' },
+              accent: { 400: '#f472b6', 500: '#ec4899', 600: '#db2777' }
+            }
+          }
+        }
+      }
+    </script>
+
     <link rel="stylesheet" href="./style.css" />
     <script src="./dictionary.js"></script>
   </head>
-  <body>
-    <!-- Animated Background -->
-    <div class="bg-effects" aria-hidden="true">
-      <div class="bg-orb bg-orb--1"></div>
-      <div class="bg-orb bg-orb--2"></div>
-      <div class="bg-orb bg-orb--3"></div>
+  <body class="bg-base text-main min-h-screen overflow-x-hidden transition-colors duration-500 font-sans selection:bg-primary-500/30">
+    
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] bg-primary-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse-slow"></div>
+      <div class="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-accent-500/15 rounded-full blur-[100px] mix-blend-screen animate-pulse-slower"></div>
+      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')] opacity-50"></div>
     </div>
-    <div class="bg-grid" aria-hidden="true"></div>
 
-    <div class="app">
-      <!-- Header -->
-      <header class="header animate-in">
-        <a class="logo" href="#" aria-label="Slang Translator">
-          <div class="logo__icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+    <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-6 min-h-screen flex flex-col">
+      
+      <header class="flex items-center justify-between mb-10 animate-fade-in-up">
+        <a href="#" class="flex items-center gap-3 group">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg shadow-primary-500/30 transform group-hover:scale-105 transition-all">
+            <i class="fas fa-language text-white text-xl"></i>
           </div>
-          <span class="logo__text">Slang Translator</span>
+          <div>
+            <h1 class="font-display font-black text-2xl tracking-tight bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">Twizzy Translate</h1>
+            <p class="text-xs text-muted font-medium tracking-wide uppercase">The Ultimate Slang Engine</p>
+          </div>
         </a>
-        <div class="header__actions">
-          <button class="btn-icon" id="historyToggle" aria-label="Translation History" title="History (Ctrl+Shift+H)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+
+        <div class="flex items-center gap-2 bg-card border border-divider rounded-full p-1.5 backdrop-blur-md shadow-lg">
+          <button id="historyToggle" class="w-10 h-10 rounded-full flex items-center justify-center text-muted hover:text-primary-400 hover:bg-hover transition-all" title="History (Ctrl+Shift+H)">
+            <i class="fas fa-clock"></i>
           </button>
-          <button class="btn-icon" id="dictToggle" aria-label="Browse Dictionary" title="Browse Dictionary (Ctrl+Shift+D)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          <button id="dictToggle" class="w-10 h-10 rounded-full flex items-center justify-center text-muted hover:text-primary-400 hover:bg-hover transition-all" title="Dictionary (Ctrl+Shift+D)">
+            <i class="fas fa-book"></i>
           </button>
-          <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle dark/light mode">
-            <div class="theme-toggle__knob">
-              <svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <div class="w-px h-5 bg-divider mx-1"></div>
+          <button id="themeToggle" class="w-14 h-8 rounded-full bg-input border border-divider relative flex items-center px-1 cursor-pointer hover:border-primary-500/50 transition-all">
+            <div class="theme-toggle__knob w-6 h-6 rounded-full bg-gradient-to-r from-primary-500 to-accent-500 flex items-center justify-center text-white text-xs shadow-md transition-transform duration-300">
+              <i class="fas fa-moon"></i>
             </div>
           </button>
         </div>
       </header>
 
-      <!-- Subtitle -->
-      <p class="subtitle animate-in animate-in--delay-1">
-        Translate between <span>Underground/Regional Slang</span> and English instantly
-      </p>
+      <main class="flex-1 flex flex-col animate-fade-in-up delay-100">
+        
+        <div class="bg-card backdrop-blur-xl border border-divider rounded-3xl shadow-2xl flex flex-col overflow-hidden relative">
+          
+          <div class="border-b border-divider bg-input/50 p-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <div class="flex-1 flex flex-col w-full sm:w-auto" id="fromSide">
+              <span class="text-[10px] font-bold text-muted uppercase tracking-widest mb-1 ml-1">Translate From</span>
+              <select id="artistSelect" class="w-full bg-input border border-divider rounded-xl px-4 py-2.5 font-display font-semibold text-main appearance-none cursor-pointer hover:border-primary-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all outline-none"></select>
+              <div id="inputLabel" class="hidden w-full bg-hover border border-primary-500/30 rounded-xl px-4 py-2.5 font-display font-bold text-primary-400 text-center cursor-default">English</div>
+            </div>
 
-      <!-- Translator Card -->
-      <main class="translator animate-in animate-in--delay-2">
-        <!-- Artist Selector Header -->
-        <div class="artist-bar">
-          <span class="artist-bar__label">Select Artist</span>
-          <span class="artist-bar__count" id="artistCount"></span>
-        </div>
+            <button id="swapBtn" class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white shadow-lg shadow-primary-500/20 hover:scale-110 active:scale-95 transition-all z-10 flex-shrink-0">
+              <i class="fas fa-exchange-alt"></i>
+            </button>
 
-        <!-- Language Bar -->
-        <div class="lang-bar">
-          <div class="lang-side" id="fromSide">
-            <span class="lang-side__label">From</span>
-            <select class="lang-select" id="artistSelect" aria-label="Select source artist"></select>
-            <div class="lang-label lang-label--active hidden" id="inputLabel">English</div>
+            <div class="flex-1 flex flex-col w-full sm:w-auto" id="toSide">
+              <span class="text-[10px] font-bold text-muted uppercase tracking-widest mb-1 ml-1 text-right sm:text-left">Translate To</span>
+              <div id="outputLabel" class="w-full bg-hover border border-primary-500/30 rounded-xl px-4 py-2.5 font-display font-bold text-primary-400 text-center cursor-default">English</div>
+              <select id="outputSelect" class="hidden w-full bg-input border border-divider rounded-xl px-4 py-2.5 font-display font-semibold text-main appearance-none cursor-pointer hover:border-primary-500 focus:border-primary-500 transition-all outline-none"></select>
+            </div>
           </div>
 
-          <button class="swap-btn" id="swapBtn" aria-label="Swap languages" title="Swap languages (Ctrl+Shift+S)">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
-              <path d="M32 96l320 0V32c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l96 96c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-96 96c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V160L32 160c-17.7 0-32-14.3-32-32s14.3-32 32-32zM480 352c17.7 0 32 14.3 32 32s-14.3 32-32 32H160v64c0 12.9-7.8 24.6-19.8 29.6s-25.7 2.2-34.9-6.9l-96-96c-6-6-9.4-14.1-9.4-22.6s3.4-16.6 9.4-22.6l96-96c9.2-9.2 22.9-11.9 34.9-6.9s19.8 16.6 19.8 29.6l0 64H480z"/>
-            </svg>
-          </button>
+          <div class="absolute top-4 right-6 text-xs font-bold text-primary-400/50 hidden sm:block pointer-events-none" id="artistCount"></div>
 
-          <div class="lang-side" id="toSide">
-            <span class="lang-side__label">To</span>
-            <div class="lang-label" id="outputLabel">English</div>
-            <select class="lang-select hidden" id="outputSelect" aria-label="Select target artist"></select>
-          </div>
-        </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 flex-1 min-h-[350px]">
+            
+            <div class="flex flex-col border-b md:border-b-0 md:border-r border-divider relative group">
+              <textarea id="inputText" class="flex-1 bg-transparent border-none resize-none p-6 text-lg text-main placeholder-muted outline-none w-full" placeholder="Type or paste text here to translate..." spellcheck="false" autofocus></textarea>
+              
+              <div id="suggestionsBox" class="px-6 pb-2 min-h-[32px] flex flex-wrap gap-2"></div>
+              
+              <div class="px-6 py-3 bg-input/30 flex items-center justify-between">
+                <span id="inputCount" class="text-xs font-medium text-muted font-mono">0 chars · 0 words</span>
+                <div class="flex gap-1">
+                  <button id="voiceInputBtn" class="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-primary-400 hover:bg-hover transition-colors relative tool-btn">
+                    <i class="fas fa-microphone"></i>
+                    <span class="tooltip-text">Voice Input</span>
+                  </button>
+                  <button id="clearBtn" class="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-accent-400 hover:bg-hover transition-colors relative tool-btn">
+                    <i class="fas fa-trash-alt"></i>
+                    <span class="tooltip-text">Clear</span>
+                  </button>
+                </div>
+              </div>
+            </div>
 
-        <!-- Word Detail Popup -->
-        <div class="word-popup" id="wordPopup" role="tooltip">
-          <div class="word-popup__header">
-            <span class="word-popup__original" id="popupOriginal"></span>
-            <span class="word-popup__arrow">→</span>
-            <span class="word-popup__translated" id="popupTranslated"></span>
-          </div>
-          <div class="word-popup__meanings" id="popupMeanings"></div>
-          <div class="word-popup__artist" id="popupArtist"></div>
-        </div>
-
-        <!-- Text Panels -->
-        <div class="text-panels">
-          <!-- Input Panel -->
-          <div class="text-panel">
-            <textarea
-              id="inputText"
-              class="text-panel__textarea"
-              placeholder="Type or paste text here..."
-              spellcheck="false"
-              autofocus
-            ></textarea>
-            <div class="suggestions" id="suggestionsBox"></div>
-            <div class="text-panel__footer">
-              <span class="char-count" id="inputCount">0 chars · 0 words</span>
-              <div class="panel-actions">
-                <button class="panel-btn" id="voiceInputBtn" aria-label="Voice input" title="Voice input (Ctrl+Shift+V)">
-                  <span class="tooltip">Speak</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-                </button>
-                <button class="panel-btn" id="clearBtn" aria-label="Clear input" title="Clear">
-                  <span class="tooltip">Clear</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
+            <div class="flex flex-col bg-input/10 relative">
+              <div id="outputDisplay" class="flex-1 p-6 text-lg text-main overflow-y-auto whitespace-pre-wrap break-words leading-relaxed" role="textbox" aria-readonly="true">
+                <span class="text-panel__placeholder text-muted italic">Translation will magically appear here...</span>
+              </div>
+              <textarea id="outputText" class="hidden"></textarea>
+              
+              <div class="px-6 py-3 bg-input/30 flex items-center justify-between border-t border-divider/50">
+                <span id="outputCount" class="text-xs font-medium text-muted font-mono">0 chars · 0 words</span>
+                <div class="flex gap-1">
+                  <button id="speakBtn" class="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-primary-400 hover:bg-hover transition-colors relative tool-btn">
+                    <i class="fas fa-volume-up"></i>
+                    <span class="tooltip-text">Listen</span>
+                  </button>
+                  <button id="shareBtn" class="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-primary-400 hover:bg-hover transition-colors relative tool-btn">
+                    <i class="fas fa-share-nodes"></i>
+                    <span class="tooltip-text">Share</span>
+                  </button>
+                  <button id="importBtn" class="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-primary-400 hover:bg-hover transition-colors relative tool-btn">
+                    <i class="fas fa-file-import"></i>
+                    <span class="tooltip-text">Import .txt</span>
+                  </button>
+                  <button id="exportBtn" class="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-primary-400 hover:bg-hover transition-colors relative tool-btn">
+                    <i class="fas fa-file-export"></i>
+                    <span class="tooltip-text">Export .txt</span>
+                  </button>
+                  <button id="copyBtn" class="w-9 h-9 rounded-lg flex items-center justify-center text-muted hover:text-green-400 hover:bg-hover transition-colors relative tool-btn">
+                    <i class="fas fa-copy copy-icon"></i>
+                    <i class="fas fa-check check-icon hidden text-green-500"></i>
+                    <span class="tooltip-text" id="copyTooltip">Copy</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- Output Panel -->
-          <div class="text-panel">
-            <div
-              id="outputDisplay"
-              class="text-panel__display"
-              role="textbox"
-              aria-readonly="true"
-              aria-label="Translation output"
-              aria-live="polite"
-            >
-              <span class="text-panel__placeholder">Translation will appear here...</span>
-            </div>
-            <textarea id="outputText" class="hidden" aria-hidden="true"></textarea>
-            <div class="suggestions"></div>
-            <div class="text-panel__footer">
-              <span class="char-count" id="outputCount">0 chars · 0 words</span>
-              <div class="panel-actions">
-                <button class="panel-btn" id="speakBtn" aria-label="Read aloud" title="Read aloud">
-                  <span class="tooltip">Speak</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-                </button>
-                <button class="panel-btn" id="shareBtn" aria-label="Share translation" title="Share">
-                  <span class="tooltip">Share</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
-                </button>
-                <button class="panel-btn" id="importBtn" aria-label="Import text file" title="Import .txt">
-                  <span class="tooltip">Import</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                </button>
-                <button class="panel-btn" id="exportBtn" aria-label="Export translation" title="Export .txt">
-                  <span class="tooltip">Export</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                </button>
-                <button class="panel-btn" id="copyBtn" aria-label="Copy translation" title="Copy (Ctrl+Shift+C)">
-                  <span class="tooltip" id="copyTooltip">Copy</span>
-                  <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                  <svg class="check-icon hidden" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                </button>
-              </div>
-            </div>
-          </div>
+          
+          <div id="statsBar" class="bg-primary-500/10 border-t border-primary-500/20 px-4 py-2 flex items-center justify-center gap-3 text-xs font-bold text-primary-400 hidden"></div>
         </div>
-
-        <!-- Translation Stats Bar -->
-        <div class="stats-bar" id="statsBar"></div>
       </main>
 
-      <!-- Hidden file input -->
-      <input type="file" id="importFile" accept=".txt" class="hidden" />
-
-      <!-- Toast -->
-      <div class="toast" id="toast" role="alert" aria-live="assertive"></div>
-
-      <!-- Footer -->
-      <footer class="footer animate-in animate-in--delay-3">
-        The Ultimate Slang Translator · Built for the culture
-        <div class="footer__shortcuts">
-          <kbd>Ctrl+Shift+S</kbd> Swap ·
-          <kbd>Ctrl+Shift+C</kbd> Copy ·
-          <kbd>Ctrl+Shift+D</kbd> Dictionary ·
-          <kbd>Ctrl+Shift+H</kbd> History ·
-          <kbd>Ctrl+Shift+V</kbd> Voice
+      <footer class="mt-8 text-center animate-fade-in-up delay-200">
+        <p class="text-xs text-muted font-medium mb-2">Built for the Culture. Powered by <span class="text-primary-400">Twizzy Engine</span>.</p>
+        <div class="flex justify-center flex-wrap gap-3 text-[10px] text-muted/60 font-mono">
+          <span><kbd class="bg-input border border-divider rounded px-1.5 py-0.5 mx-0.5 text-main">Ctrl+Shift+S</kbd> Swap</span>
+          <span><kbd class="bg-input border border-divider rounded px-1.5 py-0.5 mx-0.5 text-main">Ctrl+Shift+C</kbd> Copy</span>
+          <span><kbd class="bg-input border border-divider rounded px-1.5 py-0.5 mx-0.5 text-main">Ctrl+Shift+D</kbd> Dictionary</span>
         </div>
       </footer>
     </div>
 
-    <!-- Dictionary Modal -->
-    <div class="modal-overlay" id="dictOverlay">
-      <div class="modal dict-modal">
-        <div class="modal-header">
-          <h2>Slang Dictionary</h2>
-          <button class="modal-close" id="dictClose" aria-label="Close dictionary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    <input type="file" id="importFile" accept=".txt" class="hidden" />
+
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-card border border-primary-500/30 text-primary-100 px-6 py-3 rounded-full shadow-[0_10px_40px_rgba(139,92,246,0.3)] font-medium text-sm z-50 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none backdrop-blur-xl flex items-center gap-2">
+      <i class="fas fa-info-circle text-primary-400"></i>
+      <span id="toastMsg">Notification</span>
+    </div>
+
+    <div id="wordPopup" class="fixed z-[200] bg-card backdrop-blur-xl border border-divider rounded-2xl shadow-2xl p-4 min-w-[220px] max-w-[320px] opacity-0 pointer-events-none transform scale-95 translate-y-2 transition-all duration-200">
+      <div class="flex items-center gap-2 mb-3 pb-3 border-b border-divider">
+        <span id="popupOriginal" class="font-display font-bold text-main"></span>
+        <i class="fas fa-arrow-right text-primary-500 text-xs"></i>
+        <span id="popupTranslated" class="font-display font-black text-accent-400"></span>
+      </div>
+      <div id="popupMeanings" class="flex flex-col gap-1.5 mb-3"></div>
+      <div id="popupArtist" class="text-[10px] font-black uppercase tracking-widest text-primary-500/70 text-right"></div>
+    </div>
+
+    <div id="dictOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+      <div class="bg-card border border-divider rounded-3xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col transform scale-95 transition-transform duration-300 modal-content">
+        <div class="p-6 border-b border-divider flex items-center justify-between">
+          <h2 class="font-display font-black text-2xl text-main flex items-center gap-3">
+            <i class="fas fa-book-open text-primary-500"></i> Dictionary
+          </h2>
+          <button id="dictClose" class="w-8 h-8 rounded-full bg-input hover:bg-hover flex items-center justify-center text-muted hover:text-accent-400 transition-colors">
+            <i class="fas fa-times"></i>
           </button>
         </div>
-        <div class="dict-search">
-          <div class="dict-search-wrapper">
-            <span class="dict-search-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            </span>
-            <input type="text" id="dictSearchInput" placeholder="Search dictionary..." autocomplete="off" />
-          </div>
+        <div class="p-4 bg-input/30 border-b border-divider relative">
+          <i class="fas fa-search absolute left-8 top-1/2 -translate-y-1/2 text-muted"></i>
+          <input type="text" id="dictSearchInput" class="w-full bg-input border border-divider rounded-xl py-3 pl-12 pr-4 text-main placeholder-muted outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all" placeholder="Search for any slang or meaning...">
         </div>
-        <div class="dict-count" id="dictCount"></div>
-        <div class="dict-list" id="dictList"></div>
+        <div id="dictCount" class="px-6 py-2 text-xs font-bold text-primary-500/70 uppercase tracking-widest bg-input/10"></div>
+        <div id="dictList" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
       </div>
     </div>
 
-    <!-- History Modal -->
-    <div class="modal-overlay" id="historyOverlay">
-      <div class="modal history-modal">
-        <div class="modal-header">
-          <h2>Translation History</h2>
-          <div class="modal-header__actions">
-            <button class="btn-icon btn-icon--sm" id="historyClear" aria-label="Clear history" title="Clear all history">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-            </button>
-            <button class="modal-close" id="historyClose" aria-label="Close history">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    <div id="historyOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+      <div class="bg-card border border-divider rounded-3xl shadow-2xl w-full max-w-xl max-h-[85vh] flex flex-col transform scale-95 transition-transform duration-300 modal-content">
+        <div class="p-6 border-b border-divider flex items-center justify-between">
+          <h2 class="font-display font-black text-2xl text-main flex items-center gap-3">
+            <i class="fas fa-history text-accent-500"></i> History
+          </h2>
+          <div class="flex items-center gap-2">
+            <button id="historyClear" class="text-xs font-bold text-red-400 hover:text-red-300 bg-red-400/10 px-3 py-1.5 rounded-lg transition-colors">Clear All</button>
+            <button id="historyClose" class="w-8 h-8 rounded-full bg-input hover:bg-hover flex items-center justify-center text-muted hover:text-accent-400 transition-colors">
+              <i class="fas fa-times"></i>
             </button>
           </div>
         </div>
-        <div class="history-list" id="historyList"></div>
+        <div id="historyList" class="flex-1 overflow-y-auto p-4 space-y-2 bg-input/10"></div>
       </div>
     </div>
 
