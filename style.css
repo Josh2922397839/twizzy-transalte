@@ -167,7 +167,23 @@
   background: rgba(139, 92, 246, 0.15);
   text-decoration-style: solid;
 }
+.translated-word[data-badge]::after {
+  content: attr(data-badge);
+  vertical-align: super;
+  font-size: 0.65em;
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+  padding: 2px 4px;
+  border-radius: 6px;
+  margin-left: 3px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
 [data-theme="light"] .translated-word {
+  color: #c026d3;
+}
+[data-theme="light"] .translated-word[data-badge]::after {
+  background: rgba(192, 38, 211, 0.15);
   color: #c026d3;
 }
 

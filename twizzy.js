@@ -138,6 +138,15 @@ function buildDictionaries() {
         }
       }
     }
+    
+    // Sort dictEngToSlang arrays by most common slang across artists
+    for (const engKey in dictEngToSlang) {
+      dictEngToSlang[engKey].sort(function(a, b) {
+        const countA = (allArtistAttribution[a.toLowerCase()] || []).length;
+        const countB = (allArtistAttribution[b.toLowerCase()] || []).length;
+        return countB - countA;
+      });
+    }
   } else {
     const raw = megaDictionary[currentArtist];
     for (const slang of Object.keys(raw)) {
@@ -259,6 +268,12 @@ function translate() {
 
     if (translation) {
       let result = isEngToSlang ? translation[0] : translation;
+      let badgeHtml = "";
+      if (isEngToSlang && translation.length > 1) {
+        const altCount = translation.length - 1;
+        badgeHtml = ' data-badge="+' + altCount + '"';
+      }
+
       if (isAllCaps(original)) {
         result = result.toUpperCase();
       } else if (isCapitalized(original)) {
@@ -274,7 +289,9 @@ function translate() {
           escapeHtml(original) +
           " \u2192 " +
           escapeHtml(result) +
-          '">' +
+          '"' +
+          badgeHtml +
+          '>' +
           escapeHtml(result) +
           "</span>"
       );
