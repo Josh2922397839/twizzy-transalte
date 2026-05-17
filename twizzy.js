@@ -14,6 +14,8 @@ const el = {
   outputLabel: $("outputLabel"),
   artistSelect: $("artistSelect"),
   outputSelect: $("outputSelect"),
+  fromSide: $("fromSide"),
+  toSide: $("toSide"),
   swapBtn: $("swapBtn"),
   clearBtn: $("clearBtn"),
   copyBtn: $("copyBtn"),
@@ -42,13 +44,20 @@ const el = {
   historyList: $("historyList"),
   statsBar: $("statsBar"),
   toast: $("toast"),
+  wordPopup: $("wordPopup"),
+  popupOriginal: $("popupOriginal"),
+  popupTranslated: $("popupTranslated"),
+  popupMeanings: $("popupMeanings"),
+  popupArtist: $("popupArtist"),
 };
 
 // ── State ──
-let isEngToSlang = false;
-let currentArtist = "Yeat";
+let isEngToSlang = localStorage.getItem("slang-direction") === "e2s";
+let currentArtist = localStorage.getItem("slang-artist") || "Yeat";
+const ALL_ARTISTS_KEY = "__ALL__";
 let dictSlangToEng = {};
 let dictEngToSlang = {};
+let allArtistAttribution = {};
 let activeRegex = null;
 let history = JSON.parse(localStorage.getItem("slang-history") || "[]");
 let isListening = false;
@@ -95,20 +104,51 @@ function showToast(message, duration) {
 
 // ── Dictionary Management ──
 function buildDictionaries() {
-  const raw = megaDictionary[currentArtist];
   dictSlangToEng = {};
   dictEngToSlang = {};
+  allArtistAttribution = {};
 
-  for (const slang of Object.keys(raw)) {
-    const meanings = raw[slang];
-    dictSlangToEng[slang.toLowerCase()] = meanings[0];
-    for (let i = 0; i < meanings.length; i++) {
-      const key = meanings[i]
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[̀-ͯ]/g, "");
-      if (!(key in dictEngToSlang)) {
-        dictEngToSlang[key] = slang;
+  if (currentArtist === ALL_ARTISTS_KEY) {
+    // Merge all artist dictionaries
+    const artists = Object.keys(megaDictionary);
+    for (let a = 0; a < artists.length; a++) {
+      const artistName = artists[a];
+      const raw = megaDictionary[artistName];
+      for (const slang of Object.keys(raw)) {
+        const key = slang.toLowerCase();
+        const meanings = raw[slang];
+        if (!(key in dictSlangToEng)) {
+          dictSlangToEng[key] = meanings[0];
+          allArtistAttribution[key] = [artistName];
+        } else {
+          if (!allArtistAttribution[key].includes(artistName)) {
+            allArtistAttribution[key].push(artistName);
+          }
+        }
+        for (let i = 0; i < meanings.length; i++) {
+          const engKey = meanings[i]
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+          if (!(engKey in dictEngToSlang)) {
+            dictEngToSlang[engKey] = slang;
+          }
+        }
+      }
+    }
+  } else {
+    const raw = megaDictionary[currentArtist];
+    for (const slang of Object.keys(raw)) {
+      const meanings = raw[slang];
+      dictSlangToEng[slang.toLowerCase()] = meanings[0];
+      for (let i = 0; i < meanings.length; i++) {
+        const key = meanings[i]
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+        if (!(key in dictEngToSlang)) {
+          dictEngToSlang[key] = slang;
+        }
       }
     }
   }
@@ -140,10 +180,18 @@ function buildRegex(dict) {
 
 function populateDropdowns() {
   const artists = Object.keys(megaDictionary);
-  var html = "";
-  for (var i = 0; i < artists.length; i++) {
-    var a = artists[i];
-    var count = Object.keys(megaDictionary[a]).length;
+  // Validate saved artist
+  if (currentArtist !== ALL_ARTISTS_KEY && !artists.includes(currentArtist)) {
+    currentArtist = artists[0] || "Yeat";
+  }
+  let totalWords = 0;
+  for (let i = 0; i < artists.length; i++) {
+    totalWords += Object.keys(megaDictionary[artists[i]]).length;
+  }
+  let html = '<option value="' + ALL_ARTISTS_KEY + '">All Artists (' + totalWords + ' words)</option>';
+  for (let i = 0; i < artists.length; i++) {
+    const a = artists[i];
+    const count = Object.keys(megaDictionary[a]).length;
     html += '<option value="' + a + '">' + a + " (" + count + " words)</option>";
   }
   el.artistSelect.innerHTML = html;
@@ -154,14 +202,23 @@ function populateDropdowns() {
 }
 
 function updateArtistCount() {
-  var words = Object.keys(megaDictionary[currentArtist]).length;
-  var artists = Object.keys(megaDictionary).length;
-  el.artistCount.textContent = words + " translations \xB7 " + artists + " artists";
+  const artists = Object.keys(megaDictionary).length;
+  if (currentArtist === ALL_ARTISTS_KEY) {
+    let total = 0;
+    const allArtists = Object.keys(megaDictionary);
+    for (let i = 0; i < allArtists.length; i++) {
+      total += Object.keys(megaDictionary[allArtists[i]]).length;
+    }
+    el.artistCount.textContent = total + " translations \u00B7 " + artists + " artists (merged)";
+  } else {
+    const words = Object.keys(megaDictionary[currentArtist]).length;
+    el.artistCount.textContent = words + " translations \u00B7 " + artists + " artists";
+  }
 }
 
 // ── Translation Engine with Highlighting ──
 function translate() {
-  var raw = el.input.value;
+  const raw = el.input.value;
 
   if (!raw.trim()) {
     el.outputDisplay.innerHTML =
@@ -171,33 +228,33 @@ function translate() {
     return;
   }
 
-  var dict = isEngToSlang ? dictEngToSlang : dictSlangToEng;
-  var value = raw;
+  const dict = isEngToSlang ? dictEngToSlang : dictSlangToEng;
+  let value = raw;
 
   if (!isEngToSlang) {
-    value = value.normalize("NFD").replace(/[̀-ͯ]/g, "");
+    value = value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
-  var htmlParts = [];
-  var plainText = "";
-  var lastIndex = 0;
-  var matchCount = 0;
+  const htmlParts = [];
+  let plainText = "";
+  let lastIndex = 0;
+  let matchCount = 0;
 
-  var regex = new RegExp(activeRegex.source, activeRegex.flags);
-  var match;
+  const regex = new RegExp(activeRegex.source, activeRegex.flags);
+  let match;
 
   while ((match = regex.exec(value)) !== null) {
-    var before = value.slice(lastIndex, match.index);
+    const before = value.slice(lastIndex, match.index);
     if (before) {
       htmlParts.push(escapeHtml(before));
       plainText += before;
     }
 
-    var original = match[0];
-    var translation = dict[original.toLowerCase()];
+    const original = match[0];
+    const translation = dict[original.toLowerCase()];
 
     if (translation) {
-      var result = translation;
+      let result = translation;
       if (isAllCaps(original)) {
         result = translation.toUpperCase();
       } else if (isCapitalized(original)) {
@@ -205,9 +262,13 @@ function translate() {
       }
 
       htmlParts.push(
-        '<span class="translated-word" title="' +
+        '<span class="translated-word" data-key="' +
+          escapeHtml(original.toLowerCase()) +
+          '" data-original="' +
           escapeHtml(original) +
-          " → " +
+          '" title="' +
+          escapeHtml(original) +
+          " \u2192 " +
           escapeHtml(result) +
           '">' +
           escapeHtml(result) +
@@ -223,7 +284,7 @@ function translate() {
     lastIndex = match.index + match[0].length;
   }
 
-  var after = value.slice(lastIndex);
+  const after = value.slice(lastIndex);
   if (after) {
     htmlParts.push(escapeHtml(after));
     plainText += after;
@@ -242,8 +303,8 @@ function updateCounts(matchCount) {
   el.outputCount.textContent = formatCount(el.outputRaw.value);
 
   if (typeof matchCount === "number" && el.input.value.trim()) {
-    var totalWords = el.input.value.trim().split(/\s+/).length;
-    var pct = totalWords > 0 ? Math.round((matchCount / totalWords) * 100) : 0;
+    const totalWords = el.input.value.trim().split(/\s+/).length;
+    let pct = totalWords > 0 ? Math.round((matchCount / totalWords) * 100) : 0;
     if (pct > 100) pct = 100;
     el.statsBar.innerHTML =
       '<span class="stats-bar__item">' +
@@ -266,9 +327,9 @@ function updateCounts(matchCount) {
 }
 
 function formatCount(text) {
-  var chars = text.length;
-  var words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
-  var readTime = Math.max(1, Math.ceil(words / 200));
+  const chars = text.length;
+  const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+  const readTime = Math.max(1, Math.ceil(words / 200));
   return (
     chars +
     " char" +
@@ -287,20 +348,20 @@ function formatCount(text) {
 function updateSuggestions() {
   if (!el.suggestions) return;
 
-  var words = el.input.value.split(/\s+/);
-  var last = words[words.length - 1];
+  const words = el.input.value.split(/\s+/);
+  const last = words[words.length - 1];
 
   if (last.length < 2) {
     el.suggestions.innerHTML = "";
     return;
   }
 
-  var search = last.toLowerCase();
-  var dict = isEngToSlang ? dictEngToSlang : dictSlangToEng;
-  var matches = [];
+  const search = last.toLowerCase();
+  const dict = isEngToSlang ? dictEngToSlang : dictSlangToEng;
+  let matches = [];
+  const keys = Object.keys(dict);
 
-  var keys = Object.keys(dict);
-  for (var i = 0; i < keys.length; i++) {
+  for (let i = 0; i < keys.length; i++) {
     if (keys[i].startsWith(search) && keys[i] !== search) {
       matches.push(keys[i]);
       if (matches.length >= 5) break;
@@ -324,7 +385,7 @@ function updateSuggestions() {
 
   el.suggestions.querySelectorAll(".suggestion-chip").forEach(function (chip) {
     chip.addEventListener("click", function () {
-      var text = el.input.value;
+      const text = el.input.value;
       el.input.value = text.slice(0, text.length - last.length) + chip.textContent + " ";
       translate();
       el.suggestions.innerHTML = "";
@@ -335,19 +396,19 @@ function updateSuggestions() {
 
 // ── Fuzzy Matching (Levenshtein Distance) ──
 function levenshtein(a, b) {
-  var m = a.length;
-  var n = b.length;
-  var dp = [];
-  for (var i = 0; i <= m; i++) {
+  const m = a.length;
+  const n = b.length;
+  const dp = [];
+  for (let i = 0; i <= m; i++) {
     dp[i] = [i];
-    for (var j = 1; j <= n; j++) {
+    for (let j = 1; j <= n; j++) {
       dp[i][j] = 0;
     }
   }
-  for (var j = 0; j <= n; j++) dp[0][j] = j;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
 
-  for (var i = 1; i <= m; i++) {
-    for (var j = 1; j <= n; j++) {
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
       if (a[i - 1] === b[j - 1]) {
         dp[i][j] = dp[i - 1][j - 1];
       } else {
@@ -360,12 +421,12 @@ function levenshtein(a, b) {
 
 function fuzzySearch(query, keys, maxResults) {
   maxResults = maxResults || 3;
-  var threshold = Math.max(1, Math.floor(query.length * 0.4));
-  var scored = [];
+  const threshold = Math.max(1, Math.floor(query.length * 0.4));
+  const scored = [];
 
-  for (var i = 0; i < keys.length; i++) {
-    var compareLen = Math.min(keys[i].length, query.length + 2);
-    var dist = levenshtein(query, keys[i].slice(0, compareLen));
+  for (let i = 0; i < keys.length; i++) {
+    const compareLen = Math.min(keys[i].length, query.length + 2);
+    const dist = levenshtein(query, keys[i].slice(0, compareLen));
     if (dist <= threshold && dist > 0) {
       scored.push({ key: keys[i], dist: dist });
     }
@@ -375,18 +436,18 @@ function fuzzySearch(query, keys, maxResults) {
     return a.dist - b.dist;
   });
 
-  var result = [];
-  for (var i = 0; i < Math.min(scored.length, maxResults); i++) {
+  const result = [];
+  for (let i = 0; i < Math.min(scored.length, maxResults); i++) {
     result.push(scored[i].key);
   }
   return result;
 }
 
 // ── Translation History ──
-var saveHistoryDebounced = debounce(function (input, output, matchCount) {
+const saveHistoryDebounced = debounce(function (input, output, matchCount) {
   if (!input.trim() || !output.trim() || matchCount === 0) return;
 
-  var entry = {
+  const entry = {
     input: input.slice(0, 200),
     output: output.slice(0, 200),
     artist: currentArtist,
@@ -418,9 +479,9 @@ function renderHistory() {
     return;
   }
 
-  var html = "";
-  for (var i = 0; i < history.length; i++) {
-    var h = history[i];
+  let html = "";
+  for (let i = 0; i < history.length; i++) {
+    const h = history[i];
     html +=
       '<div class="history-entry" data-index="' +
       i +
@@ -451,8 +512,8 @@ function renderHistory() {
 
   el.historyList.querySelectorAll(".history-entry").forEach(function (entry) {
     entry.addEventListener("click", function () {
-      var idx = parseInt(entry.dataset.index);
-      var h = history[idx];
+      const idx = parseInt(entry.dataset.index);
+      const h = history[idx];
       el.input.value = h.input;
       currentArtist = h.artist;
       isEngToSlang = h.direction === "eng→slang";
@@ -467,13 +528,13 @@ function renderHistory() {
 }
 
 function timeAgo(timestamp) {
-  var diff = Date.now() - timestamp;
-  var mins = Math.floor(diff / 60000);
+  const diff = Date.now() - timestamp;
+  const mins = Math.floor(diff / 60000);
   if (mins < 1) return "just now";
   if (mins < 60) return mins + "m ago";
-  var hrs = Math.floor(mins / 60);
+  const hrs = Math.floor(mins / 60);
   if (hrs < 24) return hrs + "h ago";
-  var days = Math.floor(hrs / 24);
+  const days = Math.floor(hrs / 24);
   if (days < 30) return days + "d ago";
   return Math.floor(days / 30) + "mo ago";
 }
@@ -486,7 +547,7 @@ function speak(text) {
     return;
   }
   speechSynthesis.cancel();
-  var utterance = new SpeechSynthesisUtterance(text);
+  const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 0.9;
   utterance.pitch = 1;
 
@@ -516,7 +577,7 @@ function toggleVoiceInput() {
     return;
   }
 
-  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = true;
@@ -529,8 +590,8 @@ function toggleVoiceInput() {
   };
 
   recognition.onresult = function (event) {
-    var transcript = "";
-    for (var i = 0; i < event.results.length; i++) {
+    let transcript = "";
+    for (let i = 0; i < event.results.length; i++) {
       transcript += event.results[i][0].transcript;
     }
     el.input.value = transcript;
@@ -566,17 +627,115 @@ function closeModal(id) {
 // ── Swap Direction ──
 function updateSwapUI() {
   if (isEngToSlang) {
+    // From: English, To: Artist
     el.artistSelect.classList.add("hidden");
     el.inputLabel.classList.remove("hidden");
+    el.fromSide.appendChild(el.inputLabel);
+    el.fromSide.appendChild(el.artistSelect);
     el.outputLabel.classList.add("hidden");
     el.outputSelect.classList.remove("hidden");
+    el.toSide.appendChild(el.outputSelect);
+    el.toSide.appendChild(el.outputLabel);
   } else {
+    // From: Artist, To: English
     el.artistSelect.classList.remove("hidden");
     el.inputLabel.classList.add("hidden");
+    el.fromSide.appendChild(el.artistSelect);
+    el.fromSide.appendChild(el.inputLabel);
     el.outputLabel.classList.remove("hidden");
     el.outputSelect.classList.add("hidden");
+    el.toSide.appendChild(el.outputLabel);
+    el.toSide.appendChild(el.outputSelect);
   }
 }
+
+// ── Word Detail Popup ──
+function showWordPopup(wordEl) {
+  const key = wordEl.dataset.key;
+  const original = wordEl.dataset.original;
+  const translated = wordEl.textContent;
+
+  // Look up all meanings
+  let meanings = [];
+  let artistLabel = currentArtist;
+
+  if (currentArtist === ALL_ARTISTS_KEY) {
+    // Gather meanings from all artists that have this term
+    const artists = Object.keys(megaDictionary);
+    for (let i = 0; i < artists.length; i++) {
+      const raw = megaDictionary[artists[i]];
+      for (const slang of Object.keys(raw)) {
+        if (slang.toLowerCase() === key) {
+          for (let j = 0; j < raw[slang].length; j++) {
+            const m = raw[slang][j];
+            if (!meanings.includes(m)) meanings.push(m);
+          }
+        }
+      }
+    }
+    const attr = allArtistAttribution[key];
+    artistLabel = attr ? attr.join(", ") : "Multiple Artists";
+  } else {
+    const raw = megaDictionary[currentArtist];
+    for (const slang of Object.keys(raw)) {
+      if (slang.toLowerCase() === key) {
+        meanings = raw[slang];
+        break;
+      }
+    }
+    artistLabel = currentArtist;
+  }
+
+  el.popupOriginal.textContent = original;
+  el.popupTranslated.textContent = translated;
+  el.popupMeanings.innerHTML = meanings
+    .map(function (m) {
+      return '<span class="word-popup__meaning-item">' + escapeHtml(m) + "</span>";
+    })
+    .join("");
+  el.popupArtist.textContent = artistLabel;
+
+  // Position near the clicked word
+  const rect = wordEl.getBoundingClientRect();
+  const popup = el.wordPopup;
+  popup.classList.add("word-popup--visible");
+
+  const popupRect = popup.getBoundingClientRect();
+  let left = rect.left + rect.width / 2 - popupRect.width / 2;
+  let top = rect.bottom + 8;
+
+  // Keep within viewport
+  if (left < 8) left = 8;
+  if (left + popupRect.width > window.innerWidth - 8) {
+    left = window.innerWidth - popupRect.width - 8;
+  }
+  if (top + popupRect.height > window.innerHeight - 8) {
+    top = rect.top - popupRect.height - 8;
+  }
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+}
+
+function hideWordPopup() {
+  el.wordPopup.classList.remove("word-popup--visible");
+}
+
+// Click handler for translated words
+el.outputDisplay.addEventListener("click", function (e) {
+  const wordEl = e.target.closest(".translated-word");
+  if (wordEl) {
+    e.stopPropagation();
+    showWordPopup(wordEl);
+  }
+});
+
+// Close popup on click outside
+document.addEventListener("click", function (e) {
+  if (!e.target.closest(".word-popup") && !e.target.closest(".translated-word")) {
+    hideWordPopup();
+  }
+});
 
 // ── Event Listeners ──
 
@@ -590,18 +749,21 @@ el.input.addEventListener("input", function () {
 el.artistSelect.addEventListener("change", function (e) {
   currentArtist = e.target.value;
   el.outputSelect.value = currentArtist;
+  localStorage.setItem("slang-artist", currentArtist);
   buildDictionaries();
 });
 
 el.outputSelect.addEventListener("change", function (e) {
   currentArtist = e.target.value;
   el.artistSelect.value = currentArtist;
+  localStorage.setItem("slang-artist", currentArtist);
   buildDictionaries();
 });
 
 // Swap
 el.swapBtn.addEventListener("click", function () {
   isEngToSlang = !isEngToSlang;
+  localStorage.setItem("slang-direction", isEngToSlang ? "e2s" : "s2e");
   el.swapBtn.classList.add("swapping");
   setTimeout(function () {
     el.swapBtn.classList.remove("swapping");
@@ -629,11 +791,11 @@ el.clearBtn.addEventListener("click", function () {
 
 // Copy
 el.copyBtn.addEventListener("click", function () {
-  var text = el.outputRaw.value;
+  const text = el.outputRaw.value;
   if (!text) return;
 
-  var fallbackCopy = function () {
-    var ta = document.createElement("textarea");
+  const fallbackCopy = function () {
+    const ta = document.createElement("textarea");
     ta.value = text;
     ta.style.cssText = "position:fixed;opacity:0;left:-9999px";
     document.body.appendChild(ta);
@@ -654,8 +816,8 @@ function showCopyFeedback() {
   el.copyBtn.classList.add("panel-btn--success");
   el.copyTooltip.textContent = "Copied!";
   el.copyTooltip.classList.add("tooltip--visible");
-  var copyIcon = el.copyBtn.querySelector(".copy-icon");
-  var checkIcon = el.copyBtn.querySelector(".check-icon");
+  const copyIcon = el.copyBtn.querySelector(".copy-icon");
+  const checkIcon = el.copyBtn.querySelector(".check-icon");
   if (copyIcon) copyIcon.classList.add("hidden");
   if (checkIcon) checkIcon.classList.remove("hidden");
 
@@ -672,13 +834,13 @@ function showCopyFeedback() {
 
 // Export
 el.exportBtn.addEventListener("click", function () {
-  var text = el.outputRaw.value;
+  const text = el.outputRaw.value;
   if (!text) return;
 
-  var ts = new Date().toISOString().slice(0, 16).replace(/[T:]/g, "-");
-  var filename = "translation_" + currentArtist.replace(/\s+/g, "_") + "_" + ts + ".txt";
-  var dir = isEngToSlang ? "English → Slang" : "Slang → English";
-  var header =
+  const ts = new Date().toISOString().slice(0, 16).replace(/[T:]/g, "-");
+  const filename = "translation_" + currentArtist.replace(/\s+/g, "_") + "_" + ts + ".txt";
+  const dir = isEngToSlang ? "English \u2192 Slang" : "Slang \u2192 English";
+  const header =
     "=== Slang Translator ===\nArtist: " +
     currentArtist +
     "\nDirection: " +
@@ -686,10 +848,10 @@ el.exportBtn.addEventListener("click", function () {
     "\nDate: " +
     new Date().toLocaleString() +
     "\n========================\n\n";
-  var content = header + "Input:\n" + el.input.value + "\n\nTranslation:\n" + text;
-  var blob = new Blob([content], { type: "text/plain" });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement("a");
+  const content = header + "Input:\n" + el.input.value + "\n\nTranslation:\n" + text;
+  const blob = new Blob([content], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.click();
@@ -703,9 +865,9 @@ el.importBtn.addEventListener("click", function () {
 });
 
 el.importFile.addEventListener("change", function (e) {
-  var file = e.target.files[0];
+  const file = e.target.files[0];
   if (!file) return;
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = function (ev) {
     el.input.value = ev.target.result;
     translate();
@@ -727,10 +889,10 @@ el.voiceBtn.addEventListener("click", function () {
 
 // Share
 el.shareBtn.addEventListener("click", function () {
-  var text = el.outputRaw.value;
+  const text = el.outputRaw.value;
   if (!text) return;
 
-  var shareText =
+  const shareText =
     el.input.value + "\n→ " + text + "\n\n(" + currentArtist + " \xB7 Slang Translator)";
 
   if (navigator.share) {
@@ -795,7 +957,7 @@ el.dictOverlay.addEventListener("click", function (e) {
   if (e.target === el.dictOverlay) closeModal("dictOverlay");
 });
 
-var dictSearchTimer;
+let dictSearchTimer;
 el.dictSearch.addEventListener("input", function () {
   clearTimeout(dictSearchTimer);
   dictSearchTimer = setTimeout(function () {
@@ -804,15 +966,36 @@ el.dictSearch.addEventListener("input", function () {
 });
 
 function renderDictionary(term) {
-  var search = term.toLowerCase().trim();
-  var entries = Object.entries(megaDictionary[currentArtist]);
+  const search = term.toLowerCase().trim();
+  let entries;
+  const displayName = currentArtist === ALL_ARTISTS_KEY ? "All Artists" : currentArtist;
+
+  if (currentArtist === ALL_ARTISTS_KEY) {
+    // Merge all entries
+    const merged = {};
+    const artists = Object.keys(megaDictionary);
+    for (let a = 0; a < artists.length; a++) {
+      const raw = megaDictionary[artists[a]];
+      for (const slang of Object.keys(raw)) {
+        const key = slang.toLowerCase();
+        if (!(key in merged)) {
+          merged[key] = { display: slang, meanings: [...raw[slang]] };
+        }
+      }
+    }
+    entries = Object.values(merged).map(function (e) {
+      return [e.display, e.meanings];
+    });
+  } else {
+    entries = Object.entries(megaDictionary[currentArtist]);
+  }
 
   if (search) {
     entries = entries.filter(function (pair) {
-      var slang = pair[0];
-      var meanings = pair[1];
+      const slang = pair[0];
+      const meanings = pair[1];
       if (slang.toLowerCase().includes(search)) return true;
-      for (var i = 0; i < meanings.length; i++) {
+      for (let i = 0; i < meanings.length; i++) {
         if (meanings[i].toLowerCase().includes(search)) return true;
       }
       return false;
@@ -829,7 +1012,7 @@ function renderDictionary(term) {
     " translation" +
     (entries.length !== 1 ? "s" : "") +
     " for " +
-    currentArtist;
+    displayName;
 
   if (entries.length === 0) {
     el.dictList.innerHTML =
@@ -842,16 +1025,16 @@ function renderDictionary(term) {
     return;
   }
 
-  var html = "";
-  for (var i = 0; i < entries.length; i++) {
-    var slang = entries[i][0];
-    var meanings = entries[i][1];
+  let html = "";
+  for (let i = 0; i < entries.length; i++) {
+    const slang = entries[i][0];
+    const meanings = entries[i][1];
     html +=
       '<div class="dict-entry">' +
       '<div class="dict-entry__slang">' +
       escapeHtml(slang) +
       "</div>" +
-      '<div class="dict-entry__arrow">→</div>' +
+      '<div class="dict-entry__arrow">\u2192</div>' +
       '<div class="dict-entry__meaning">' +
       meanings.map(escapeHtml).join(", ") +
       "</div>" +
@@ -865,7 +1048,7 @@ function setTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
   localStorage.setItem("slang-theme", theme);
 
-  var knob = document.querySelector(".theme-toggle__knob");
+  const knob = document.querySelector(".theme-toggle__knob");
   if (theme === "dark") {
     knob.innerHTML =
       '<svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
@@ -874,15 +1057,15 @@ function setTheme(theme) {
       '<svg class="theme-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>';
   }
 
-  var meta = document.querySelector('meta[name="theme-color"]');
+  const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = theme === "dark" ? "#06060c" : "#f4f2f7";
 }
 
-var savedTheme = localStorage.getItem("slang-theme") || "dark";
+const savedTheme = localStorage.getItem("slang-theme") || "dark";
 setTheme(savedTheme);
 
 el.themeToggle.addEventListener("click", function () {
-  var current = document.documentElement.getAttribute("data-theme");
+  const current = document.documentElement.getAttribute("data-theme");
   setTheme(current === "dark" ? "light" : "dark");
 });
 
@@ -898,7 +1081,7 @@ document.addEventListener("keydown", function (e) {
   }
 
   if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
-    var key = e.key.toUpperCase();
+    const key = e.key.toUpperCase();
     if (key === "S") {
       e.preventDefault();
       el.swapBtn.click();
@@ -941,9 +1124,9 @@ el.input.addEventListener("drop", function (e) {
   el.input.classList.remove("drag-over");
 
   if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-    var file = e.dataTransfer.files[0];
+    const file = e.dataTransfer.files[0];
     if (file.type === "text/plain" || file.name.endsWith(".txt")) {
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.onload = function (ev) {
         el.input.value = ev.target.result;
         translate();
@@ -955,7 +1138,7 @@ el.input.addEventListener("drop", function (e) {
     }
   }
 
-  var text = e.dataTransfer.getData("text");
+  const text = e.dataTransfer.getData("text");
   if (text) {
     el.input.value = text;
     translate();
@@ -965,4 +1148,5 @@ el.input.addEventListener("drop", function (e) {
 
 // ── Initialize ──
 populateDropdowns();
+updateSwapUI();
 buildDictionaries();

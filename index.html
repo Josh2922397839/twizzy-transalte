@@ -62,8 +62,11 @@
 
         <!-- Language Bar -->
         <div class="lang-bar">
-          <select class="lang-select" id="artistSelect" aria-label="Select Artist"></select>
-          <div class="lang-label lang-label--active hidden" id="inputLabel">English</div>
+          <div class="lang-side" id="fromSide">
+            <span class="lang-side__label">From</span>
+            <select class="lang-select" id="artistSelect" aria-label="Select source artist"></select>
+            <div class="lang-label lang-label--active hidden" id="inputLabel">English</div>
+          </div>
 
           <button class="swap-btn" id="swapBtn" aria-label="Swap languages" title="Swap languages (Ctrl+Shift+S)">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
@@ -71,8 +74,22 @@
             </svg>
           </button>
 
-          <div class="lang-label" id="outputLabel">English</div>
-          <select class="lang-select hidden" id="outputSelect" aria-label="Select Artist"></select>
+          <div class="lang-side" id="toSide">
+            <span class="lang-side__label">To</span>
+            <div class="lang-label" id="outputLabel">English</div>
+            <select class="lang-select hidden" id="outputSelect" aria-label="Select target artist"></select>
+          </div>
+        </div>
+
+        <!-- Word Detail Popup -->
+        <div class="word-popup" id="wordPopup" role="tooltip">
+          <div class="word-popup__header">
+            <span class="word-popup__original" id="popupOriginal"></span>
+            <span class="word-popup__arrow">→</span>
+            <span class="word-popup__translated" id="popupTranslated"></span>
+          </div>
+          <div class="word-popup__meanings" id="popupMeanings"></div>
+          <div class="word-popup__artist" id="popupArtist"></div>
         </div>
 
         <!-- Text Panels -->
