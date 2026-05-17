@@ -131,7 +131,9 @@ function buildDictionaries() {
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "");
           if (!(engKey in dictEngToSlang)) {
-            dictEngToSlang[engKey] = slang;
+            dictEngToSlang[engKey] = [slang];
+          } else if (!dictEngToSlang[engKey].includes(slang)) {
+            dictEngToSlang[engKey].push(slang);
           }
         }
       }
@@ -147,7 +149,9 @@ function buildDictionaries() {
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "");
         if (!(key in dictEngToSlang)) {
-          dictEngToSlang[key] = slang;
+          dictEngToSlang[key] = [slang];
+        } else if (!dictEngToSlang[key].includes(slang)) {
+          dictEngToSlang[key].push(slang);
         }
       }
     }
@@ -254,11 +258,11 @@ function translate() {
     const translation = dict[original.toLowerCase()];
 
     if (translation) {
-      let result = translation;
+      let result = isEngToSlang ? translation[0] : translation;
       if (isAllCaps(original)) {
-        result = translation.toUpperCase();
+        result = result.toUpperCase();
       } else if (isCapitalized(original)) {
-        result = capitalize(translation);
+        result = capitalize(result);
       }
 
       htmlParts.push(
@@ -659,31 +663,40 @@ function showWordPopup(wordEl) {
   let meanings = [];
   let artistLabel = currentArtist;
 
-  if (currentArtist === ALL_ARTISTS_KEY) {
-    // Gather meanings from all artists that have this term
-    const artists = Object.keys(megaDictionary);
-    for (let i = 0; i < artists.length; i++) {
-      const raw = megaDictionary[artists[i]];
-      for (const slang of Object.keys(raw)) {
-        if (slang.toLowerCase() === key) {
-          for (let j = 0; j < raw[slang].length; j++) {
-            const m = raw[slang][j];
-            if (!meanings.includes(m)) meanings.push(m);
+  if (isEngToSlang) {
+    meanings = dictEngToSlang[key] || [translated];
+    if (currentArtist === ALL_ARTISTS_KEY) {
+      const attr = allArtistAttribution[translated.toLowerCase()];
+      artistLabel = attr ? attr.join(", ") : "Multiple Artists";
+    } else {
+      artistLabel = currentArtist;
+    }
+  } else {
+    if (currentArtist === ALL_ARTISTS_KEY) {
+      const artists = Object.keys(megaDictionary);
+      for (let i = 0; i < artists.length; i++) {
+        const raw = megaDictionary[artists[i]];
+        for (const slang of Object.keys(raw)) {
+          if (slang.toLowerCase() === key) {
+            for (let j = 0; j < raw[slang].length; j++) {
+              const m = raw[slang][j];
+              if (!meanings.includes(m)) meanings.push(m);
+            }
           }
         }
       }
-    }
-    const attr = allArtistAttribution[key];
-    artistLabel = attr ? attr.join(", ") : "Multiple Artists";
-  } else {
-    const raw = megaDictionary[currentArtist];
-    for (const slang of Object.keys(raw)) {
-      if (slang.toLowerCase() === key) {
-        meanings = raw[slang];
-        break;
+      const attr = allArtistAttribution[key];
+      artistLabel = attr ? attr.join(", ") : "Multiple Artists";
+    } else {
+      const raw = megaDictionary[currentArtist];
+      for (const slang of Object.keys(raw)) {
+        if (slang.toLowerCase() === key) {
+          meanings = raw[slang];
+          break;
+        }
       }
+      artistLabel = currentArtist;
     }
-    artistLabel = currentArtist;
   }
 
   el.popupOriginal.textContent = original;
